@@ -21,11 +21,27 @@ func Warning(err error) {
 	saveLogs(timeNow, "[warning]", err.Error())
 }
 
+func Warningf(format string, args ...interface{}) {
+	timeNow := time.Now()
+	valueBase := fmt.Sprintf(format, args...)
+	value := getFormattedValue(timeNow, valueBase)
+	prettyPrints.Warning(value)
+	saveLogs(timeNow, "[warning]", valueBase)
+}
+
 func Fatal(err error) {
 	timeNow := time.Now()
 	value := getFormattedValue(timeNow, err.Error())
 	prettyPrints.Fatal(value)
 	saveLogs(timeNow, "[fatal]", err.Error())
+}
+
+func Fatalf(format string, args ...interface{}) {
+	timeNow := time.Now()
+	valueBase := fmt.Sprintf(format, args...)
+	value := getFormattedValue(timeNow, valueBase)
+	prettyPrints.Fatal(value)
+	saveLogs(timeNow, "[fatal]", valueBase)
 }
 
 func Info(values ...any) {
@@ -35,11 +51,27 @@ func Info(values ...any) {
 	saveLogs(timeNow, "[info]", values...)
 }
 
+func Infof(format string, args ...interface{}) {
+	timeNow := time.Now()
+	valueBase := fmt.Sprintf(format, args...)
+	valueString := getFormattedValue(timeNow, valueBase)
+	prettyPrints.Info(valueString)
+	saveLogs(timeNow, "[info]", valueBase)
+}
+
 func Success(values ...any) {
 	timeNow := time.Now()
 	valueString := getFormattedValue(timeNow, values...)
 	prettyPrints.Success(valueString)
 	saveLogs(timeNow, "[success]", values...)
+}
+
+func Successf(format string, args ...interface{}) {
+	timeNow := time.Now()
+	valueBase := fmt.Sprintf(format, args...)
+	valueString := getFormattedValue(timeNow, valueBase)
+	prettyPrints.Success(valueString)
+	saveLogs(timeNow, "[success]", valueBase)
 }
 
 // Without saving
