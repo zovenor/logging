@@ -25,7 +25,7 @@ func Success(value string) {
 
 func Warning(value string) {
 	checkNewLine(&value)
-	warning := color.New(color.Bold, color.FgHiRed)
+	warning := color.New(color.Bold, color.FgYellow)
 	warning.Print(value)
 }
 
