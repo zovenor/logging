@@ -10,7 +10,7 @@ import (
 	"github.com/zovenor/logging/prettyPrints"
 )
 
-const formatterTime string = "2006/01/02 15:04:05"
+const formatterTime string = "15:04:05"
 const formatterTimeForFile string = "2006-01-02-15h"
 
 func Warning(err error) {
