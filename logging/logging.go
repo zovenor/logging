@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 	"path"
+	"runtime"
 	"time"
 
 	"github.com/zovenor/logging/prettyPrints"
@@ -66,7 +67,10 @@ func Fatal(err error) {
 		err = fmt.Errorf("")
 	}
 	timeNow := time.Now()
-	value := getFormattedValue(timeNow, err.Error())
+	v := err.Error()
+	_, filename, line, _ := runtime.Caller(1)
+	v = fmt.Sprintf("%v:%v: ", filename, line) + v
+	value := getFormattedValue(timeNow, v)
 	prettyPrints.Fatal(value)
 	saveLogs(timeNow, "[fatal]", err.Error())
 }
