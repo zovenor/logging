@@ -72,7 +72,7 @@ func Fatal(err error) {
 	v = fmt.Sprintf("%v:%v: ", filename, line) + v
 	value := getFormattedValue(timeNow, v)
 	prettyPrints.Fatal(value)
-	saveLogs(timeNow, "[fatal]", err.Error())
+	saveLogs(timeNow, "[fatal]", v)
 }
 
 func FatalPrint(err error) {
