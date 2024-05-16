@@ -195,14 +195,14 @@ func SuccessfSave(format string, args ...interface{}) {
 func Println(values ...any) {
 	timeNow := time.Now()
 	value := getFormattedValue(timeNow, values...)
-	fmt.Print(value)
+	prettyPrints.Print(value)
 }
 
 func Printf(format string, args ...interface{}) {
 	timeNow := time.Now()
 	value := fmt.Sprintf(format, args...)
 	value = getFormattedValue(timeNow, value)
-	fmt.Print(value)
+	prettyPrints.Print(value)
 }
 
 // Additional functions

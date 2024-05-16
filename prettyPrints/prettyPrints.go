@@ -37,6 +37,12 @@ func Fatal(value string) {
 
 func Info(value string) {
 	checkNewLine(&value)
-	info := color.New(color.FgBlue)
+	info := color.New()
 	info.Print(value)
+}
+
+func Print(value string) {
+	checkNewLine(&value)
+	print := color.New(color.Faint)
+	print.Print(value)
 }
