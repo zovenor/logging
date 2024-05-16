@@ -68,8 +68,12 @@ func Fatal(err error) {
 	}
 	timeNow := time.Now()
 	v := err.Error()
+	packagePath, err := getBinPath()
+	if err != nil {
+		log.Fatal(err)
+	}
 	_, filename, line, _ := runtime.Caller(1)
-	v = fmt.Sprintf("%v:%v: ", filename, line) + v
+	v = fmt.Sprintf("%v:%v: %v", filename[len(packagePath):], line, v)
 	value := getFormattedValue(timeNow, v)
 	prettyPrints.Fatal(value)
 	saveLogs(timeNow, "[fatal]", v)
@@ -223,8 +227,16 @@ func openLogFileOrCreate(dirPath string, fileName string) (*os.File, error) {
 	return logFile, nil
 }
 
-func saveLogs(timeNow time.Time, prefix string, values ...any) error {
+func getBinPath() (string, error) {
 	projectPath, err := os.Getwd()
+	if err != nil {
+		return "", err
+	}
+	return projectPath, nil
+}
+
+func saveLogs(timeNow time.Time, prefix string, values ...any) error {
+	projectPath, err := getBinPath()
 	if err != nil {
 		return err
 	}
