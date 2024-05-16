@@ -1,4 +1,4 @@
-tests:
+test:
 	go run tests/tests.go
 
-.PHONY: tests
+.PHONY: test
