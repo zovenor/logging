@@ -23,6 +23,7 @@ type LoggerConfigs struct {
 	timeFormatter     string
 	timeFileFormatter string
 	logsDirPath       string
+	binPath           string
 }
 
 func BaseLoggerConfigs() (*LoggerConfigs, error) {
@@ -34,6 +35,7 @@ func BaseLoggerConfigs() (*LoggerConfigs, error) {
 		timeFormatter:     timeFormatter,
 		timeFileFormatter: timeFileFormatter,
 		logsDirPath:       path.Join(binPath, baseLogsDir),
+		binPath:           binPath,
 	}, nil
 }
 

@@ -23,6 +23,6 @@ func main() {
 	logging.InfoSave("info message")
 
 	logging.InfoPrint("info message: %v", 10000)
-	logging.InfoPrint("info message", types.WithChanneling)
-	logging.InfoPrint("info message: %v %v", 999, types.WithChanneling, true)
+	logging.InfoPrint("info message: %v", types.WithChanneling)
+	logging.InfoPrint("info message: %v", 999, types.WithChanneling, true)
 }

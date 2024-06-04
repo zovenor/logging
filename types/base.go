@@ -65,6 +65,7 @@ func LogHandler(value any, msgType MessageType, action HandlerAction, args ...an
 		value = fmt.Sprint(value)
 	}
 	msg := NewMessage(value, msgType, opts...)
+	msg.SetAction(action)
 	switch action {
 	case PrintAndSaveAction:
 		return PrintAndSave(msg)
