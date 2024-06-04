@@ -8,10 +8,19 @@ go get github.com/zovenor/logging/v2
 ### [Example 1](./examples/example_1/main.go)
 Logs:
 ```logfile
-[info]2023/11/13 16:39:49.760819 logging.go:91: info message
-[success]2023/11/13 16:39:49.760907 logging.go:91: success message
-[fatal]2023/11/13 16:39:49.760938 logging.go:91: error message
-[warning]2023/11/13 16:39:49.760965 logging.go:91: warning message
+[success]2024/06/04 18:36:34 success message
+[success]2024/06/04 18:36:34 success message
+[fatal]2024/06/04 18:36:34 
+	> /examples/example_1/main.go:13
+	fatal message
+[fatal]2024/06/04 18:36:34 
+	> /examples/example_1/main.go:15
+	fatal message
+[warning]2024/06/04 18:36:34 warning message
+[warning]2024/06/04 18:36:34 warning message
+[info]2024/06/04 18:36:34 info message
+[info]2024/06/04 18:36:34 info message
+
 ```
 Terminal:
 ```shell
