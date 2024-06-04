@@ -1,21 +1,8 @@
 package prettyPrints
 
 import (
-	"fmt"
-	"strings"
-
 	"github.com/fatih/color"
 )
-
-func checkNewLine(value *string) {
-	if !strings.HasSuffix(*value, "\n") {
-		*value = *value + "\n"
-	}
-}
-
-func ClearTerminal() {
-	fmt.Print("\033[H\033[2J")
-}
 
 func Success(value string) {
 	checkNewLine(&value)
