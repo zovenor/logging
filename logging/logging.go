@@ -14,199 +14,398 @@ import (
 const formatterTime string = "15:04:05"
 const formatterTimeForFile string = "2006-01-02-15h"
 
-func Warning(err error) {
-	if err == nil {
-		err = fmt.Errorf("")
+func Warning(e error, opts ...func(*LogConfigs)) error {
+	if e == nil {
+		e = fmt.Errorf("")
+	}
+
+	_, err := UpdateChannel(e.Error(), &LogConfigs{msgType: WarningMessageType}, opts...)
+	if err != nil {
+		return err
 	}
 	timeNow := time.Now()
-	value := getFormattedValue(timeNow, err.Error())
+	value := getFormattedValue(timeNow, e.Error())
 	prettyPrints.Warning(value)
-	saveLogs(timeNow, "[warning]", err.Error())
+	err = saveLogs(timeNow, "[warning]", e.Error())
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
-func WarningPrint(err error) {
-	if err == nil {
-		err = fmt.Errorf("")
+func WarningPrint(e error, opts ...func(*LogConfigs)) error {
+	if e == nil {
+		e = fmt.Errorf("")
+	}
+	_, err := UpdateChannel(e.Error(), &LogConfigs{msgType: WarningMessageType}, opts...)
+	if err != nil {
+		return err
 	}
 	timeNow := time.Now()
-	value := getFormattedValue(timeNow, err.Error())
+	value := getFormattedValue(timeNow, e.Error())
 	prettyPrints.Warning(value)
+	return nil
 }
 
-func WarningSave(err error) {
-	if err == nil {
-		err = fmt.Errorf("")
+func WarningSave(e error, opts ...func(*LogConfigs)) error {
+	if e == nil {
+		e = fmt.Errorf("")
+	}
+	_, err := UpdateChannel(e.Error(), &LogConfigs{msgType: WarningMessageType}, opts...)
+	if err != nil {
+		return err
 	}
 	timeNow := time.Now()
-	saveLogs(timeNow, "[warning]", err.Error())
+	err = saveLogs(timeNow, "[warning]", e.Error())
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
-func Warningf(format string, args ...interface{}) {
+func Warningf(format string, args ...interface{}) error {
+	args, opts := getOptsFromInterface(args)
 	timeNow := time.Now()
 	valueBase := fmt.Sprintf(format, args...)
+	_, err := UpdateChannel(valueBase, &LogConfigs{msgType: WarningMessageType}, opts...)
+	if err != nil {
+		return err
+	}
 	value := getFormattedValue(timeNow, valueBase)
 	prettyPrints.Warning(value)
-	saveLogs(timeNow, "[warning]", valueBase)
+	err = saveLogs(timeNow, "[warning]", valueBase)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
-func WarningfPrint(format string, args ...interface{}) {
+func WarningfPrint(format string, args ...interface{}) error {
+	args, opts := getOptsFromInterface(args)
 	timeNow := time.Now()
 	valueBase := fmt.Sprintf(format, args...)
+	_, err := UpdateChannel(valueBase, &LogConfigs{msgType: WarningMessageType}, opts...)
+	if err != nil {
+		return err
+	}
 	value := getFormattedValue(timeNow, valueBase)
 	prettyPrints.Warning(value)
+	return nil
 }
 
-func WarningfSave(format string, args ...interface{}) {
+func WarningfSave(format string, args ...interface{}) error {
+	args, opts := getOptsFromInterface(args)
 	timeNow := time.Now()
 	valueBase := fmt.Sprintf(format, args...)
-	saveLogs(timeNow, "[warning]", valueBase)
+	_, err := UpdateChannel(valueBase, &LogConfigs{msgType: WarningMessageType}, opts...)
+	if err != nil {
+		return err
+	}
+	err = saveLogs(timeNow, "[warning]", valueBase)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
-func Fatal(err error) {
-	if err == nil {
-		err = fmt.Errorf("")
+func Fatal(e error, opts ...func(*LogConfigs)) error {
+	if e == nil {
+		e = fmt.Errorf("")
+	}
+	_, err := UpdateChannel(e.Error(), &LogConfigs{msgType: FatalMessageType}, opts...)
+	if err != nil {
+		return err
 	}
 	timeNow := time.Now()
-	v := err.Error()
+	v := e.Error()
 	packagePath, err := getBinPath()
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 	_, filename, line, _ := runtime.Caller(1)
 	v = fmt.Sprintf("%v:%v: %v", filename[len(packagePath):], line, v)
 	value := getFormattedValue(timeNow, v)
 	prettyPrints.Fatal(value)
-	saveLogs(timeNow, "[fatal]", v)
+	err = saveLogs(timeNow, "[fatal]", v)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
-func FatalPrint(err error) {
-	if err == nil {
-		err = fmt.Errorf("")
+func FatalPrint(e error, opts ...func(*LogConfigs)) error {
+	if e == nil {
+		e = fmt.Errorf("")
+	}
+	_, err := UpdateChannel(e.Error(), &LogConfigs{msgType: FatalMessageType}, opts...)
+	if err != nil {
+		return err
 	}
 	timeNow := time.Now()
-	value := getFormattedValue(timeNow, err.Error())
+	value := getFormattedValue(timeNow, e.Error())
 	prettyPrints.Fatal(value)
+	return nil
 }
 
-func FatalSave(err error) {
-	if err == nil {
-		err = fmt.Errorf("")
+func FatalSave(e error, opts ...func(*LogConfigs)) error {
+	if e == nil {
+		e = fmt.Errorf("")
+	}
+	_, err := UpdateChannel(e.Error(), &LogConfigs{msgType: FatalMessageType}, opts...)
+	if err != nil {
+		return err
 	}
 	timeNow := time.Now()
-	saveLogs(timeNow, "[fatal]", err.Error())
+	err = saveLogs(timeNow, "[fatal]", e.Error())
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
-func Fatalf(format string, args ...interface{}) {
+func Fatalf(format string, args ...interface{}) error {
+	args, opts := getOptsFromInterface(args)
 	timeNow := time.Now()
 	valueBase := fmt.Sprintf(format, args...)
+	_, err := UpdateChannel(valueBase, &LogConfigs{msgType: FatalMessageType}, opts...)
+	if err != nil {
+		return err
+	}
 	value := getFormattedValue(timeNow, valueBase)
 	prettyPrints.Fatal(value)
-	saveLogs(timeNow, "[fatal]", valueBase)
+	err = saveLogs(timeNow, "[fatal]", valueBase)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
-func FatalfPrint(format string, args ...interface{}) {
+func FatalfPrint(format string, args ...interface{}) error {
+	args, opts := getOptsFromInterface(args)
 	timeNow := time.Now()
 	valueBase := fmt.Sprintf(format, args...)
+	_, err := UpdateChannel(valueBase, &LogConfigs{msgType: FatalMessageType}, opts...)
+	if err != nil {
+		return err
+	}
 	value := getFormattedValue(timeNow, valueBase)
 	prettyPrints.Fatal(value)
+	return nil
 }
 
-func FatalfSave(format string, args ...interface{}) {
+func FatalfSave(format string, args ...interface{}) error {
+	args, opts := getOptsFromInterface(args)
 	timeNow := time.Now()
 	valueBase := fmt.Sprintf(format, args...)
-	saveLogs(timeNow, "[fatal]", valueBase)
+	_, err := UpdateChannel(valueBase, &LogConfigs{msgType: FatalMessageType}, opts...)
+	if err != nil {
+		return err
+	}
+	err = saveLogs(timeNow, "[fatal]", valueBase)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
-func Info(values ...any) {
+func Info(values ...any) error {
+	values, opts := getOptsFromInterface(values)
 	timeNow := time.Now()
+	_, err := UpdateChannel(fmt.Sprint(values), &LogConfigs{msgType: InfoMessageType}, opts...)
+	if err != nil {
+		return err
+	}
 	valueString := getFormattedValue(timeNow, values...)
 	prettyPrints.Info(valueString)
-	saveLogs(timeNow, "[info]", values...)
+	err = saveLogs(timeNow, "[info]", values...)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
-func InfoPrint(values ...any) {
+func InfoPrint(values ...any) error {
+	values, opts := getOptsFromInterface(values)
 	timeNow := time.Now()
+	_, err := UpdateChannel(fmt.Sprint(values), &LogConfigs{msgType: InfoMessageType}, opts...)
+	if err != nil {
+		return err
+	}
 	valueString := getFormattedValue(timeNow, values...)
 	prettyPrints.Info(valueString)
+	return nil
 }
 
-func InfoSave(values ...any) {
+func InfoSave(values ...any) error {
+	values, opts := getOptsFromInterface(values)
 	timeNow := time.Now()
-	saveLogs(timeNow, "[info]", values...)
+	_, err := UpdateChannel(fmt.Sprint(values), &LogConfigs{msgType: InfoMessageType}, opts...)
+	if err != nil {
+		return err
+	}
+	err = saveLogs(timeNow, "[info]", values...)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
-func Infof(format string, args ...interface{}) {
+func Infof(format string, args ...interface{}) error {
+	args, opts := getOptsFromInterface(args)
 	timeNow := time.Now()
 	valueBase := fmt.Sprintf(format, args...)
+	_, err := UpdateChannel(valueBase, &LogConfigs{msgType: InfoMessageType}, opts...)
+	if err != nil {
+		return err
+	}
 	valueString := getFormattedValue(timeNow, valueBase)
 	prettyPrints.Info(valueString)
-	saveLogs(timeNow, "[info]", valueBase)
+	err = saveLogs(timeNow, "[info]", valueBase)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
-func InfofPrint(format string, args ...interface{}) {
+func InfofPrint(format string, args ...interface{}) error {
+	args, opts := getOptsFromInterface(args)
 	timeNow := time.Now()
 	valueBase := fmt.Sprintf(format, args...)
+	_, err := UpdateChannel(valueBase, &LogConfigs{msgType: InfoMessageType}, opts...)
+	if err != nil {
+		return err
+	}
 	valueString := getFormattedValue(timeNow, valueBase)
 	prettyPrints.Info(valueString)
+	return nil
 }
 
-func InfofSave(format string, args ...interface{}) {
+func InfofSave(format string, args ...interface{}) error {
+	args, opts := getOptsFromInterface(args)
 	timeNow := time.Now()
 	valueBase := fmt.Sprintf(format, args...)
-	saveLogs(timeNow, "[info]", valueBase)
+	_, err := UpdateChannel(valueBase, &LogConfigs{msgType: InfoMessageType}, opts...)
+	if err != nil {
+		return err
+	}
+	err = saveLogs(timeNow, "[info]", valueBase)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
-func Success(values ...any) {
+func Success(values ...any) error {
+	values, opts := getOptsFromInterface(values)
 	timeNow := time.Now()
+	_, err := UpdateChannel(fmt.Sprint(values), &LogConfigs{msgType: SuccessMessageType}, opts...)
+	if err != nil {
+		return err
+	}
 	valueString := getFormattedValue(timeNow, values...)
 	prettyPrints.Success(valueString)
-	saveLogs(timeNow, "[success]", values...)
+	err = saveLogs(timeNow, "[success]", values...)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
-func SuccessPrint(values ...any) {
+func SuccessPrint(values ...any) error {
+	values, opts := getOptsFromInterface(values)
 	timeNow := time.Now()
+	_, err := UpdateChannel(fmt.Sprint(values), &LogConfigs{msgType: SuccessMessageType}, opts...)
+	if err != nil {
+		return err
+	}
 	valueString := getFormattedValue(timeNow, values...)
 	prettyPrints.Success(valueString)
+	return nil
 }
 
-func SuccessSave(values ...any) {
+func SuccessSave(values ...any) error {
+	values, opts := getOptsFromInterface(values)
 	timeNow := time.Now()
-	saveLogs(timeNow, "[success]", values...)
+	_, err := UpdateChannel(fmt.Sprint(values), &LogConfigs{msgType: SuccessMessageType}, opts...)
+	if err != nil {
+		return err
+	}
+	err = saveLogs(timeNow, "[success]", values...)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
-func Successf(format string, args ...interface{}) {
+func Successf(format string, args ...interface{}) error {
+	args, opts := getOptsFromInterface(args)
 	timeNow := time.Now()
 	valueBase := fmt.Sprintf(format, args...)
+	_, err := UpdateChannel(valueBase, &LogConfigs{msgType: SuccessMessageType}, opts...)
+	if err != nil {
+		return err
+	}
 	valueString := getFormattedValue(timeNow, valueBase)
 	prettyPrints.Success(valueString)
-	saveLogs(timeNow, "[success]", valueBase)
+	err = saveLogs(timeNow, "[success]", valueBase)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
-func SuccessfPrint(format string, args ...interface{}) {
+func SuccessfPrint(format string, args ...interface{}) error {
+	args, opts := getOptsFromInterface(args)
 	timeNow := time.Now()
 	valueBase := fmt.Sprintf(format, args...)
+	_, err := UpdateChannel(valueBase, &LogConfigs{msgType: SuccessMessageType}, opts...)
+	if err != nil {
+		return err
+	}
 	valueString := getFormattedValue(timeNow, valueBase)
 	prettyPrints.Success(valueString)
+	return nil
 }
 
-func SuccessfSave(format string, args ...interface{}) {
+func SuccessfSave(format string, args ...interface{}) error {
+	args, opts := getOptsFromInterface(args)
 	timeNow := time.Now()
 	valueBase := fmt.Sprintf(format, args...)
-	saveLogs(timeNow, "[success]", valueBase)
+	_, err := UpdateChannel(valueBase, &LogConfigs{msgType: SuccessMessageType}, opts...)
+	if err != nil {
+		return err
+	}
+	err = saveLogs(timeNow, "[success]", valueBase)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 // Without saving
-func Println(values ...any) {
+func Println(values ...any) error {
+	values, opts := getOptsFromInterface(values)
 	timeNow := time.Now()
+	_, err := UpdateChannel(fmt.Sprint(values), &LogConfigs{msgType: PrintMessageType}, opts...)
+	if err != nil {
+		return err
+	}
 	value := getFormattedValue(timeNow, values...)
 	prettyPrints.Print(value)
+	return nil
 }
 
-func Printf(format string, args ...interface{}) {
+func Printf(format string, args ...interface{}) error {
+	args, opts := getOptsFromInterface(args)
 	timeNow := time.Now()
 	value := fmt.Sprintf(format, args...)
+	_, err := UpdateChannel(value, &LogConfigs{msgType: PrintMessageType}, opts...)
+	if err != nil {
+		return err
+	}
 	value = getFormattedValue(timeNow, value)
 	prettyPrints.Print(value)
+	return nil
 }
 
 // Additional functions
