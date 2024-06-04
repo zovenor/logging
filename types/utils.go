@@ -9,7 +9,9 @@ import (
 	"time"
 )
 
-func getOptsFromInterface(args ...any) (filteredArgs []any, opts []func(*Message)) {
+func getOptsFromInterface(args ...any) ([]any, []func(*Message)) {
+	filteredArgs := make([]any, 0)
+	opts := make([]func(*Message), 0)
 	for _, arg := range args {
 		if opt, ok := arg.(func(*Message)); ok {
 			opts = append(opts, opt)
