@@ -24,6 +24,7 @@ type Message struct {
 	value   string
 	msgType MessageType
 	time    time.Time
+	action  HandlerAction
 
 	sendToChan bool
 }
@@ -36,6 +37,9 @@ func (m *Message) SetType(t MessageType) { m.msgType = t }
 
 func (m *Message) Time() time.Time     { return m.time }
 func (m *Message) SetTime(t time.Time) { m.time = t }
+
+func (m *Message) Action() HandlerAction      { return m.action }
+func (m *Message) SetAction(ha HandlerAction) { m.action = ha }
 
 // Opts
 

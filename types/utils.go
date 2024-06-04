@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 	"path"
+	"runtime"
 	"time"
 )
 
@@ -41,6 +42,26 @@ func setOpts(message *Message, opts ...func(*Message)) {
 }
 
 func saveLogs(message *Message, prefix string) error {
+	if message.msgType == FatalMessageType {
+		psList := make([]string, 0)
+		skip := 4
+		if message.action == PrintAndSaveAction {
+			skip = 5
+		}
+		for i := range 100 {
+			_, filename, line, _ := runtime.Caller(i + skip)
+			if filename == "" {
+				break
+			}
+			psList = append(psList, fmt.Sprintf("%v:%v", filename, line))
+		}
+		psList = psList[:len(psList)-2]
+		message.value = "	" + message.value
+		for _, psElem := range psList {
+			message.value = fmt.Sprintf("	> %v\n%v", psElem[len(loggerConfigs.binPath):], message.value)
+		}
+		message.value = "\n" + message.value
+	}
 	fileName := fmt.Sprintf("%v.log", message.time.Format(timeFileFormatter))
 	file, err := openLogFileOrCreate(loggerConfigs.logsDirPath, fileName)
 	if err != nil {
@@ -48,7 +69,7 @@ func saveLogs(message *Message, prefix string) error {
 		return err
 	}
 	defer file.Close()
-	logger := log.New(file, prefix, log.LstdFlags|log.Lshortfile|log.Lmicroseconds)
+	logger := log.New(file, prefix, log.LstdFlags)
 	logger.Println(message.value)
 	return nil
 }
