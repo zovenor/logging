@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 	"path"
+	"path/filepath"
 	"runtime"
 	"time"
 )
@@ -43,7 +44,44 @@ func setOpts(message *Message, opts ...func(*Message)) {
 	}
 }
 
+func checkOldLogs() (err error) {
+	defer func() {
+		if err != nil {
+			err = fmt.Errorf("check old logs error: %v", err.Error())
+		}
+	}()
+	// Last checking
+	if !loggerConfigs.lastCheckingTime.IsZero() && time.Now().Before(loggerConfigs.lastCheckingTime.Add(loggerConfigs.checkingDelay)) {
+		return nil
+	}
+	timeNow := time.Now()
+	loggerConfigs.lastCheckingTime = timeNow
+	files, err := os.ReadDir(loggerConfigs.logsDirPath)
+	if err != nil {
+		return err
+	}
+	for _, file := range files {
+		filePath := filepath.Join(loggerConfigs.logsDirPath, file.Name())
+
+		fileInfo, errFile := os.Stat(filePath)
+		if errFile != nil {
+			continue
+		}
+		if timeNow.After(fileInfo.ModTime().Add(loggerConfigs.removeLogsDelay)) {
+			errFile = os.Remove(filePath)
+			if errFile != nil {
+				continue
+			}
+		}
+	}
+	return nil
+}
+
 func saveLogs(message *Message, prefix string) error {
+	err := checkOldLogs()
+	if err != nil {
+		return err
+	}
 	if message.msgType == FatalMessageType {
 		psList := make([]string, 0)
 		skip := 4
