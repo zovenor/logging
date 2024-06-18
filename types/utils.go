@@ -2,12 +2,16 @@ package types
 
 import (
 	"fmt"
+	"io/ioutil"
 	"log"
 	"os"
 	"path"
+	"path/filepath"
 	"runtime"
 	"time"
 )
+
+var lastCheckOldFiles time.Time
 
 func getOptsFromInterface(args ...any) ([]any, []func(*Message)) {
 	filteredArgs := make([]any, 0)
@@ -43,7 +47,41 @@ func setOpts(message *Message, opts ...func(*Message)) {
 	}
 }
 
+func checkOldLogs() {
+    if time.Since(lastCheckOldFiles) < 1*time.Hour {
+        return
+    }
+    lastCheckOldFiles = time.Now()
+
+	now := time.Now()
+	files, err := ioutil.ReadDir(loggerConfigs.logsDirPath)
+	if err != nil {
+		log.Fatal(err)
+	}
+	for _, file := range files {
+		filePath := filepath.Join(loggerConfigs.logsDirPath, file.Name())
+        fmt.Println(filePath)
+
+		fileInfo, err := os.Stat(filePath)
+		if err != nil {
+			log.Printf("Не удалось получить информацию о файле: %v", err)
+			continue
+		}
+        fmt.Println(fileInfo.ModTime())
+
+		if now.Sub(fileInfo.ModTime()) > 24*time.Hour {
+			err := os.Remove(filePath)
+			if err != nil {
+				log.Printf("Не удалось удалить файл: %v", err)
+			} else {
+				fmt.Printf("Файл удален: %s\n", filePath)
+			}
+		}
+	}
+}
+
 func saveLogs(message *Message, prefix string) error {
+    checkOldLogs()
 	if message.msgType == FatalMessageType {
 		psList := make([]string, 0)
 		skip := 4
