@@ -49,8 +49,10 @@ func setOpts(message *Message, opts ...func(*Message)) {
 
 func checkOldLogs() {
     if time.Since(lastCheckOldFiles) < 1*time.Hour {
+        fmt.Println("return old logs")
         return
     }
+    fmt.Println("clear old logs")
     lastCheckOldFiles = time.Now()
 
 	now := time.Now()
