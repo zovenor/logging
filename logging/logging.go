@@ -2,9 +2,11 @@ package logging
 
 import (
 	"fmt"
+	"io/ioutil"
 	"log"
 	"os"
 	"path"
+	"path/filepath"
 	"runtime"
 	"time"
 
@@ -13,6 +15,7 @@ import (
 
 const formatterTime string = "15:04:05"
 const formatterTimeForFile string = "2006-01-02-15h"
+var lastCheckOldFiles time.Time
 
 func Warning(err error) {
 	if err == nil {
@@ -235,6 +238,39 @@ func getBinPath() (string, error) {
 	return projectPath, nil
 }
 
+func checkOldLogs(dir string) {
+    if time.Since(lastCheckOldFiles) < 1*time.Hour {
+        return
+    }
+    lastCheckOldFiles = time.Now()
+
+	now := time.Now()
+	files, err := ioutil.ReadDir(dir)
+	if err != nil {
+		log.Fatal(err)
+	}
+	for _, file := range files {
+		filePath := filepath.Join(dir, file.Name())
+        fmt.Println(filePath)
+
+		fileInfo, err := os.Stat(filePath)
+		if err != nil {
+			log.Printf("Не удалось получить информацию о файле: %v", err)
+			continue
+		}
+        fmt.Println(fileInfo.ModTime())
+
+		if now.Sub(fileInfo.ModTime()) > 24*time.Hour {
+			err := os.Remove(filePath)
+			if err != nil {
+				log.Printf("Не удалось удалить файл: %v", err)
+			} else {
+				fmt.Printf("Файл удален: %s\n", filePath)
+			}
+		}
+	}
+}
+
 func saveLogs(timeNow time.Time, prefix string, values ...any) error {
 	projectPath, err := getBinPath()
 	if err != nil {
@@ -242,6 +278,7 @@ func saveLogs(timeNow time.Time, prefix string, values ...any) error {
 	}
 	fileName := fmt.Sprintf("%v.log", timeNow.Format(formatterTimeForFile))
 	logsDir := path.Join(projectPath, "logs")
+    checkOldLogs(logsDir)
 	file, err := openLogFileOrCreate(logsDir, fileName)
 	if err != nil {
 		defer file.Close()
