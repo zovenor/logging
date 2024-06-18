@@ -3,6 +3,7 @@ package types
 import (
 	"fmt"
 	"path"
+	"time"
 )
 
 const (
@@ -24,6 +25,11 @@ type LoggerConfigs struct {
 	timeFileFormatter string
 	logsDirPath       string
 	binPath           string
+
+	removeLogsDelay time.Duration
+
+	lastCheckingTime time.Time
+	checkingDelay    time.Duration
 }
 
 func BaseLoggerConfigs() (*LoggerConfigs, error) {
@@ -36,6 +42,9 @@ func BaseLoggerConfigs() (*LoggerConfigs, error) {
 		timeFileFormatter: timeFileFormatter,
 		logsDirPath:       path.Join(binPath, baseLogsDir),
 		binPath:           binPath,
+		removeLogsDelay:   14 * 24 * time.Hour, // 2 weeks
+		lastCheckingTime:  time.Time{},
+		checkingDelay:     1 * time.Hour,
 	}, nil
 }
 
@@ -45,4 +54,12 @@ func (lc *LoggerConfigs) sendToChan(msg *Message) error {
 	}
 	lc.listenChan <- msg
 	return nil
+}
+
+func (lc *LoggerConfigs) SetRemoveLogDelay(timeout time.Duration) {
+	lc.removeLogsDelay = timeout
+}
+
+func (lc *LoggerConfigs) SetCheckingDelay(delay time.Duration) {
+	lc.checkingDelay = delay
 }

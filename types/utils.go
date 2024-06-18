@@ -2,7 +2,6 @@ package types
 
 import (
 	"fmt"
-	"io/ioutil"
 	"log"
 	"os"
 	"path"
@@ -10,8 +9,6 @@ import (
 	"runtime"
 	"time"
 )
-
-var lastCheckOldFiles time.Time
 
 func getOptsFromInterface(args ...any) ([]any, []func(*Message)) {
 	filteredArgs := make([]any, 0)
@@ -47,36 +44,44 @@ func setOpts(message *Message, opts ...func(*Message)) {
 	}
 }
 
-func checkOldLogs() {
-    if time.Since(lastCheckOldFiles) < 1*time.Hour {
-        return
-    }
-    lastCheckOldFiles = time.Now()
-
-	now := time.Now()
-	files, err := ioutil.ReadDir(loggerConfigs.logsDirPath)
+func checkOldLogs() (err error) {
+	defer func() {
+		if err != nil {
+			err = fmt.Errorf("check old logs error: %v", err.Error())
+		}
+	}()
+	// Last checking
+	if !loggerConfigs.lastCheckingTime.IsZero() && time.Now().Before(loggerConfigs.lastCheckingTime.Add(loggerConfigs.checkingDelay)) {
+		return nil
+	}
+	timeNow := time.Now()
+	loggerConfigs.lastCheckingTime = timeNow
+	files, err := os.ReadDir(loggerConfigs.logsDirPath)
 	if err != nil {
-        return
+		return err
 	}
 	for _, file := range files {
 		filePath := filepath.Join(loggerConfigs.logsDirPath, file.Name())
 
-		fileInfo, err := os.Stat(filePath)
-		if err != nil {
+		fileInfo, errFile := os.Stat(filePath)
+		if errFile != nil {
 			continue
 		}
-
-		if now.Sub(fileInfo.ModTime()) > 24*time.Hour {
-			err := os.Remove(filePath)
-			if err != nil {
-                continue
-			}	
-        }
+		if timeNow.After(fileInfo.ModTime().Add(loggerConfigs.removeLogsDelay)) {
+			errFile = os.Remove(filePath)
+			if errFile != nil {
+				continue
+			}
+		}
 	}
+	return nil
 }
 
 func saveLogs(message *Message, prefix string) error {
-    checkOldLogs()
+	err := checkOldLogs()
+	if err != nil {
+		return err
+	}
 	if message.msgType == FatalMessageType {
 		psList := make([]string, 0)
 		skip := 4
