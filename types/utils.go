@@ -56,27 +56,22 @@ func checkOldLogs() {
 	now := time.Now()
 	files, err := ioutil.ReadDir(loggerConfigs.logsDirPath)
 	if err != nil {
-		log.Fatal(err)
+        return
 	}
 	for _, file := range files {
 		filePath := filepath.Join(loggerConfigs.logsDirPath, file.Name())
-        fmt.Println(filePath)
 
 		fileInfo, err := os.Stat(filePath)
 		if err != nil {
-			log.Printf("Не удалось получить информацию о файле: %v", err)
 			continue
 		}
-        fmt.Println(fileInfo.ModTime())
 
 		if now.Sub(fileInfo.ModTime()) > 24*time.Hour {
 			err := os.Remove(filePath)
 			if err != nil {
-				log.Printf("Не удалось удалить файл: %v", err)
-			} else {
-				fmt.Printf("Файл удален: %s\n", filePath)
-			}
-		}
+                continue
+			}	
+        }
 	}
 }
 
