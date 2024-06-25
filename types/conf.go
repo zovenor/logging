@@ -56,10 +56,6 @@ func (lc *LoggerConfigs) sendToChan(msg *Message) error {
 	return nil
 }
 
-func (lc *LoggerConfigs) SendToChan(msg *Message) error {
-	return lc.sendToChan(msg)
-}
-
 func (lc *LoggerConfigs) SetRemoveLogDelay(timeout time.Duration) {
 	lc.removeLogsDelay = timeout
 }

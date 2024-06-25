@@ -59,3 +59,8 @@ func SuccessPrint(value any, args ...any) error {
 func SuccessSave(value any, args ...any) error {
 	return types.LogHandler(value, types.SuccessMessageType, types.SaveAction, args...)
 }
+
+// Channeling
+func SendToChan(msg *types.Message) error {
+	return types.SendToChan(msg)
+}
