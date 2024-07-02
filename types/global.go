@@ -10,3 +10,7 @@ func MakeGlobalChannel(channelSize uint64) chan *Message {
 func SendToChan(msg *Message) error {
 	return loggerConfigs.sendToChan(msg)
 }
+
+func GetErrorUpdates() <-chan error {
+	return loggerConfigs.GetErrorUpdates()
+}

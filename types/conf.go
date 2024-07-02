@@ -30,6 +30,7 @@ type LoggerConfigs struct {
 
 	lastCheckingTime time.Time
 	checkingDelay    time.Duration
+	errorsChan       chan error
 }
 
 func BaseLoggerConfigs() (*LoggerConfigs, error) {
@@ -46,6 +47,30 @@ func BaseLoggerConfigs() (*LoggerConfigs, error) {
 		lastCheckingTime:  time.Time{},
 		checkingDelay:     1 * time.Hour,
 	}, nil
+}
+
+// Errors channels
+
+func (lc *LoggerConfigs) ErrorsChannelIsEmpty() bool {
+	return lc.errorsChan == nil
+}
+
+func (lc *LoggerConfigs) SendErrorToChan(err error) {
+	if !lc.ErrorsChannelIsEmpty() {
+		lc.errorsChan <- err
+	}
+}
+
+func (lc *LoggerConfigs) GetErrorUpdates() <-chan error {
+	if lc.ErrorsChannelIsEmpty() {
+		lc.errorsChan = make(chan error)
+	}
+	return lc.errorsChan
+}
+
+func (lc *LoggerConfigs) CloseErrorChan() {
+	close(lc.errorsChan)
+	lc.errorsChan = nil
 }
 
 func (lc *LoggerConfigs) sendToChan(msg *Message) error {

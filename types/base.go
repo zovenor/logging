@@ -57,7 +57,7 @@ const (
 	SaveAction
 )
 
-func LogHandler(value any, msgType MessageType, action HandlerAction, args ...any) error {
+func LogHandler(value any, msgType MessageType, action HandlerAction, args ...any) {
 	args, opts := getOptsFromInterface(args...)
 	if len(args) > 0 {
 		value = fmt.Sprintf(fmt.Sprint(value), args...)
@@ -68,12 +68,16 @@ func LogHandler(value any, msgType MessageType, action HandlerAction, args ...an
 	msg.SetAction(action)
 	switch action {
 	case PrintAndSaveAction:
-		return PrintAndSave(msg)
+		err := PrintAndSave(msg)
+		if err != nil {
+			loggerConfigs.SendErrorToChan(err)
+		}
 	case PrintAction:
 		PrintOnly(msg)
-		return nil
 	case SaveAction:
-		return SaveOnly(msg)
+		err := SaveOnly(msg)
+		if err != nil {
+			loggerConfigs.SendErrorToChan(err)
+		}
 	}
-	return nil
 }
